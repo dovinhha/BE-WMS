@@ -5,11 +5,11 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export class createBranchTable1636647500580 implements MigrationInterface {
+export class createSaleOrderTable1649079541827 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'branches',
+        name: 'sale_orders',
         columns: [
           {
             name: 'id',
@@ -19,30 +19,33 @@ export class createBranchTable1636647500580 implements MigrationInterface {
             generationStrategy: 'increment',
           },
           {
-            name: 'cartegories_id',
+            name: 'customer_id',
             type: 'int',
+          },
+          {
+            name: 'code',
+            type: 'varchar',
+            length: '45',
           },
           {
             name: 'name',
             type: 'varchar',
-            length: '100',
+            length: '255',
+          },
+          {
+            name: 'status',
+            type: 'int',
           },
           {
             name: 'description',
             type: 'varchar',
-            length: '100',
-            isNullable: true,
-          },
-          {
-            name: 'logo',
-            type: 'varchar',
-            length: '100',
-            isNullable: true,
-          },
-          {
-            name: 'slug',
-            type: 'varchar',
             length: '255',
+            isNullable: true,
+          },
+          {
+            name: 'exported_date',
+            type: 'timestamptz',
+            isNullable: true,
           },
           {
             name: 'created_at',
@@ -54,26 +57,33 @@ export class createBranchTable1636647500580 implements MigrationInterface {
             type: 'timestamptz',
             default: 'now()',
           },
+          {
+            name: 'deleted_at',
+            type: 'timestamptz',
+            isNullable: true,
+          },
         ],
       }),
     );
 
     await queryRunner.createForeignKey(
-      'branches',
+      'sale_orders',
       new TableForeignKey({
-        columnNames: ['cartegories_id'],
+        columnNames: ['customer_id'],
         referencedColumnNames: ['id'],
-        referencedTableName: 'categories',
+        referencedTableName: 'customers',
         onDelete: 'CASCADE',
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable(
-      new Table({
-        name: 'branches',
-      }),
+    const table = await queryRunner.getTable('sale_orders');
+    const foreignKey1 = table.foreignKeys.find(
+      (fk) => fk.columnNames.indexOf('customer_id') !== -1,
     );
+
+    await queryRunner.dropForeignKey('sale_orders', foreignKey1);
+    await queryRunner.dropTable('sale_orders');
   }
 }

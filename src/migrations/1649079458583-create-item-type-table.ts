@@ -1,15 +1,10 @@
-import {
-  MigrationInterface,
-  QueryRunner,
-  Table,
-  TableForeignKey,
-} from 'typeorm';
+import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class createCategoryTable1636646388753 implements MigrationInterface {
+export class createItemTypeTable1649079458583 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'categories',
+        name: 'item_types',
         columns: [
           {
             name: 'id',
@@ -19,25 +14,20 @@ export class createCategoryTable1636646388753 implements MigrationInterface {
             generationStrategy: 'increment',
           },
           {
-            name: 'cartegories_id',
-            type: 'int',
-            isNullable: true,
+            name: 'code',
+            type: 'varchar',
+            length: '45',
           },
           {
             name: 'name',
             type: 'varchar',
-            length: '100',
+            length: '255',
           },
           {
             name: 'description',
             type: 'varchar',
-            length: '100',
-            isNullable: true,
-          },
-          {
-            name: 'slug',
-            type: 'varchar',
             length: '255',
+            isNullable: true,
           },
           {
             name: 'created_at',
@@ -49,26 +39,17 @@ export class createCategoryTable1636646388753 implements MigrationInterface {
             type: 'timestamptz',
             default: 'now()',
           },
+          {
+            name: 'deleted_at',
+            type: 'timestamptz',
+            isNullable: true,
+          },
         ],
-      }),
-    );
-
-    await queryRunner.createForeignKey(
-      'categories',
-      new TableForeignKey({
-        columnNames: ['id'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'categories',
-        onDelete: 'CASCADE',
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable(
-      new Table({
-        name: 'categories',
-      }),
-    );
+    await queryRunner.dropTable('item_types');
   }
 }

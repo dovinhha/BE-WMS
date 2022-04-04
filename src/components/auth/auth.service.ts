@@ -19,6 +19,7 @@ import { plainToClass } from 'class-transformer';
 import { GetProfileResponse } from './dto/response/get-profile.response';
 import { ForgotPasswordRequest } from './dto/request/fotgot-password.request';
 import { sendOtp } from '@utils/send-sms';
+import { jwtConstants } from '@config/config';
 
 @Injectable()
 export class AuthService {
@@ -72,7 +73,11 @@ export class AuthService {
       ttl: 10000000,
     });
 
-    return new ResponseBuilder({ token, refreshToken })
+    return new ResponseBuilder({
+      token,
+      refreshToken,
+      expired: jwtConstants.expiresIn,
+    })
       .withMessage(ResponseMessageEnum.SUCCESS)
       .withCode(ResponseCodeEnum.SUCCESS)
       .build();
@@ -93,7 +98,7 @@ export class AuthService {
 
       const token = this.jwtService.sign({ id: verify?.id });
 
-      return new ResponseBuilder({ token })
+      return new ResponseBuilder({ token, expired: jwtConstants.expiresIn })
         .withMessage(ResponseMessageEnum.SUCCESS)
         .withCode(ResponseCodeEnum.SUCCESS)
         .build();

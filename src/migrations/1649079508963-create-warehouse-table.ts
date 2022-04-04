@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export class createUserTable1634312028133 implements MigrationInterface {
+export class createWarehouseTable1649079508963 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'users',
+        name: 'warehouses',
         columns: [
           {
             name: 'id',
@@ -14,44 +14,25 @@ export class createUserTable1634312028133 implements MigrationInterface {
             generationStrategy: 'increment',
           },
           {
-            name: 'phone',
+            name: 'code',
             type: 'varchar',
-            length: '10',
+            length: '45',
           },
           {
-            name: 'email',
-            type: 'varchar',
-            length: '100',
-            isNullable: true,
-          },
-          {
-            name: 'fullname',
-            type: 'varchar',
-            length: '100',
-          },
-          {
-            name: 'gender',
-            type: 'int',
-          },
-          {
-            name: 'password',
+            name: 'name',
             type: 'varchar',
             length: '255',
           },
           {
-            name: 'role',
-            type: 'int',
-            default: 0,
-          },
-          {
-            name: 'otp',
+            name: 'description',
             type: 'varchar',
-            length: '10',
+            length: '255',
             isNullable: true,
           },
           {
-            name: 'otp_expired',
-            type: 'timestamptz',
+            name: 'address',
+            type: 'varchar',
+            length: '255',
             isNullable: true,
           },
           {
@@ -64,12 +45,17 @@ export class createUserTable1634312028133 implements MigrationInterface {
             type: 'timestamptz',
             default: 'now()',
           },
+          {
+            name: 'deleted_at',
+            type: 'timestamptz',
+            isNullable: true,
+          },
         ],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('users');
+    await queryRunner.dropTable('warehouses');
   }
 }
