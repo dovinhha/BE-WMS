@@ -1,51 +1,41 @@
-export class ResponseBuilder {
-  private data: any;
-  private message: string;
-  private statusCode: number;
-  private page: number;
-  private total: number;
+import { ResponseCodeEnum } from '@enums/response-code.enum';
+import { ResponsePayload } from './response-payload';
 
-  constructor(data?: any) {
-    this.data = data;
+export class ResponseBuilder<T> {
+  private payload: ResponsePayload<T> = {
+    code: ResponseCodeEnum.SUCCESS,
+  };
+
+  constructor(data?: T) {
+    this.payload.data = data;
   }
 
-  public withCode(statusCode: number) {
-    this.statusCode = statusCode;
+  withCode(code: ResponseCodeEnum): ResponseBuilder<T> {
+    this.payload.code = code;
     return this;
   }
 
-  public withMessage(message: string) {
-    this.message = message;
+  withMessage(message: string): ResponseBuilder<T> {
+    this.payload.message = message;
     return this;
   }
 
-  public withPage({ page, total }) {
-    this.page = page;
-    this.total = total;
+  withData(data: T): ResponseBuilder<T> {
+    this.payload.data = data;
     return this;
   }
 
-  public build() {
-    return {
-      statusCode: this.statusCode,
-      message: this.message,
-      data: this.data,
-      pagination: this.page && {
-        page: Number(this.page),
-        total: this.total,
-      },
-    };
+  withMeta(meta: unknown): ResponseBuilder<T> {
+    this.payload.meta = meta;
+    return this;
   }
 
-  public buildWithPagination() {
-    return {
-      statusCode: this.statusCode,
-      message: this.message,
-      data: this.data,
-      pagination: this.page && {
-        page: Number(this.page),
-        total: this.total,
-      },
-    };
+  withType(type: string): ResponseBuilder<T> {
+    this.payload.type = type;
+    return this;
+  }
+
+  build(): ResponsePayload<T> {
+    return this.payload;
   }
 }
