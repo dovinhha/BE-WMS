@@ -2,6 +2,9 @@ import { Expose } from 'class-transformer';
 
 export class GetItemTypeResponse {
   @Expose()
+  id: number;
+
+  @Expose()
   code: string;
 
   @Expose()
