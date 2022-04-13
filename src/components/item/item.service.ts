@@ -67,7 +67,10 @@ export class ItemService {
   }
 
   async update(request: UpdateItemRequest & DetailRequest): Promise<any> {
-    const item = await this.itemRepository.findOne(request.id);
+    const item = await this.itemRepository.findOne({
+      id: request.id,
+      deletedAt: null,
+    });
 
     if (!item) {
       return new ResponseBuilder()
@@ -133,7 +136,10 @@ export class ItemService {
   }
 
   async delete(request: DetailRequest): Promise<any> {
-    const item = await this.itemRepository.findOne(request.id);
+    const item = await this.itemRepository.findOne({
+      id: request.id,
+      deletedAt: null,
+    });
 
     if (!item) {
       return new ResponseBuilder()

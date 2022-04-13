@@ -50,6 +50,7 @@ export class ItemRepository extends Repository<ItemEntity> {
         'qb2',
         'qb2.id = i.item_type_id',
       )
+      .where('i.deleted_at IS NULL')
       .groupBy('i.id');
     const data = await query
       .offset(request.skip)
@@ -93,6 +94,7 @@ export class ItemRepository extends Repository<ItemEntity> {
         'qb2.id = i.item_type_id',
       )
       .where('i.id = :id', { id })
+      .andWhere('i.deleted_at IS NULL')
       .getRawOne();
   }
 }

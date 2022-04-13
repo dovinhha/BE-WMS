@@ -40,7 +40,10 @@ export class ItemUnitService {
   }
 
   async update(request: UpdateItemUnitRequest & DetailRequest): Promise<any> {
-    const itemUnit = await this.itemUnitRepository.findOne(request.id);
+    const itemUnit = await this.itemUnitRepository.findOne({
+      id: request.id,
+      deletedAt: null,
+    });
 
     if (!itemUnit) {
       return new ResponseBuilder()
@@ -66,7 +69,10 @@ export class ItemUnitService {
   }
 
   async detail(request: DetailRequest): Promise<any> {
-    const itemUnit = await this.itemUnitRepository.findOne(request.id);
+    const itemUnit = await this.itemUnitRepository.findOne({
+      id: request.id,
+      deletedAt: null,
+    });
 
     if (!itemUnit) {
       return new ResponseBuilder()
@@ -86,7 +92,10 @@ export class ItemUnitService {
   }
 
   async delete(request: DetailRequest): Promise<any> {
-    const itemUnit = await this.itemUnitRepository.findOne(request.id);
+    const itemUnit = await this.itemUnitRepository.findOne({
+      id: request.id,
+      deletedAt: null,
+    });
 
     if (!itemUnit) {
       return new ResponseBuilder()

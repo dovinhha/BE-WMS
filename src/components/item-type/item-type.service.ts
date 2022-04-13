@@ -40,7 +40,10 @@ export class ItemTypeService {
   }
 
   async update(request: UpdateItemTypeRequest & DetailRequest): Promise<any> {
-    const itemType = await this.itemTypeRepository.findOne(request.id);
+    const itemType = await this.itemTypeRepository.findOne({
+      id: request.id,
+      deletedAt: null,
+    });
 
     if (!itemType) {
       return new ResponseBuilder()
@@ -66,7 +69,10 @@ export class ItemTypeService {
   }
 
   async detail(request: DetailRequest): Promise<any> {
-    const itemType = await this.itemTypeRepository.findOne(request.id);
+    const itemType = await this.itemTypeRepository.findOne({
+      id: request.id,
+      deletedAt: null,
+    });
 
     if (!itemType) {
       return new ResponseBuilder()
@@ -86,7 +92,10 @@ export class ItemTypeService {
   }
 
   async delete(request: DetailRequest): Promise<any> {
-    const itemType = await this.itemTypeRepository.findOne(request.id);
+    const itemType = await this.itemTypeRepository.findOne({
+      id: request.id,
+      deletedAt: null,
+    });
 
     if (!itemType) {
       return new ResponseBuilder()

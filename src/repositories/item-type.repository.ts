@@ -14,7 +14,7 @@ export class ItemTypeRepository extends Repository<ItemTypeEntity> {
   }
 
   async list(request: ListItemUnitQuery): Promise<[ItemTypeEntity[], number]> {
-    const query = this.createQueryBuilder();
+    const query = this.createQueryBuilder().where('deleted_at IS NULL');
     const data = await query.offset(request.skip).limit(request.take).getMany();
     const count = await query.getCount();
 
