@@ -5,9 +5,8 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { GetItemRequest } from './get-item.request';
 
-export class UpdateItemRequest extends GetItemRequest {
+export class UpdateItemRequest {
   @MinLength(1)
   @IsString()
   @IsNotEmpty()

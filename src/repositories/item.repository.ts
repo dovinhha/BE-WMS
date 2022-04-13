@@ -49,7 +49,8 @@ export class ItemRepository extends Repository<ItemEntity> {
             .from(ItemTypeEntity, 'it'),
         'qb2',
         'qb2.id = i.item_type_id',
-      );
+      )
+      .groupBy('i.id');
     const data = await query
       .offset(request.skip)
       .limit(request.take)

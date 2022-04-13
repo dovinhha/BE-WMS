@@ -3,12 +3,12 @@ import { ResponseMessageEnum } from '@enums/response-message.enum';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemTypeRepository } from '@repositories/item-type.repository';
+import { DetailRequest } from '@utils/detail.request';
 import { PagingResponse } from '@utils/paging.response';
 import { ResponseBuilder } from '@utils/response-builder';
 import { plainToClass } from 'class-transformer';
 import { ListItemTypeQuery } from './dto/query/list-item-type.query';
 import { CreateItemTypeRequest } from './dto/request/create-item-type.request';
-import { GetItemTypeRequest } from './dto/request/get-item-type.request';
 import { UpdateItemTypeRequest } from './dto/request/update-item-type.request';
 import { GetItemTypeResponse } from './dto/response/get-item-type.response';
 @Injectable()
@@ -39,7 +39,7 @@ export class ItemTypeService {
       .build();
   }
 
-  async update(request: UpdateItemTypeRequest): Promise<any> {
+  async update(request: UpdateItemTypeRequest & DetailRequest): Promise<any> {
     const itemType = await this.itemTypeRepository.findOne(request.id);
 
     if (!itemType) {
@@ -65,7 +65,7 @@ export class ItemTypeService {
       .build();
   }
 
-  async detail(request: GetItemTypeRequest): Promise<any> {
+  async detail(request: DetailRequest): Promise<any> {
     const itemType = await this.itemTypeRepository.findOne(request.id);
 
     if (!itemType) {
@@ -85,7 +85,7 @@ export class ItemTypeService {
       .build();
   }
 
-  async delete(request: GetItemTypeRequest): Promise<any> {
+  async delete(request: DetailRequest): Promise<any> {
     const itemType = await this.itemTypeRepository.findOne(request.id);
 
     if (!itemType) {

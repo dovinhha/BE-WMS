@@ -6,12 +6,12 @@ import { ItemTypeRepository } from '@repositories/item-type.repository';
 import { ItemUnitRepository } from '@repositories/item-unit.repository';
 import { ItemRepository } from '@repositories/item.repository';
 import { ApiError } from '@utils/api.error';
+import { DetailRequest } from '@utils/detail.request';
 import { PagingResponse } from '@utils/paging.response';
 import { ResponseBuilder } from '@utils/response-builder';
 import { plainToClass } from 'class-transformer';
 import { ListItemQuery } from './dto/query/list-item.query';
 import { CreateItemRequest } from './dto/request/create-item.request';
-import { GetItemRequest } from './dto/request/get-item.request';
 import { UpdateItemRequest } from './dto/request/update-item.request';
 import { GetItemResponse } from './dto/response/get-item.response';
 @Injectable()
@@ -66,7 +66,7 @@ export class ItemService {
       .build();
   }
 
-  async update(request: UpdateItemRequest): Promise<any> {
+  async update(request: UpdateItemRequest & DetailRequest): Promise<any> {
     const item = await this.itemRepository.findOne(request.id);
 
     if (!item) {
@@ -112,7 +112,7 @@ export class ItemService {
       .build();
   }
 
-  async detail(request: GetItemRequest): Promise<any> {
+  async detail(request: DetailRequest): Promise<any> {
     const item = await this.itemRepository.detail(request.id);
 
     if (!item) {
@@ -132,7 +132,7 @@ export class ItemService {
       .build();
   }
 
-  async delete(request: GetItemRequest): Promise<any> {
+  async delete(request: DetailRequest): Promise<any> {
     const item = await this.itemRepository.findOne(request.id);
 
     if (!item) {

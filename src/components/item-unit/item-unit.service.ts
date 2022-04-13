@@ -3,12 +3,12 @@ import { ResponseMessageEnum } from '@enums/response-message.enum';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemUnitRepository } from '@repositories/item-unit.repository';
+import { DetailRequest } from '@utils/detail.request';
 import { PagingResponse } from '@utils/paging.response';
 import { ResponseBuilder } from '@utils/response-builder';
 import { plainToClass } from 'class-transformer';
 import { ListItemUnitQuery } from './dto/query/list-item-unit.query';
 import { CreateItemUnitRequest } from './dto/request/create-item-unit.request';
-import { GetItemUnitRequest } from './dto/request/get-item-unit.request';
 import { UpdateItemUnitRequest } from './dto/request/update-item-unit.request';
 import { GetItemUnitResponse } from './dto/response/get-item-unit.response';
 @Injectable()
@@ -39,7 +39,7 @@ export class ItemUnitService {
       .build();
   }
 
-  async update(request: UpdateItemUnitRequest): Promise<any> {
+  async update(request: UpdateItemUnitRequest & DetailRequest): Promise<any> {
     const itemUnit = await this.itemUnitRepository.findOne(request.id);
 
     if (!itemUnit) {
@@ -65,7 +65,7 @@ export class ItemUnitService {
       .build();
   }
 
-  async detail(request: GetItemUnitRequest): Promise<any> {
+  async detail(request: DetailRequest): Promise<any> {
     const itemUnit = await this.itemUnitRepository.findOne(request.id);
 
     if (!itemUnit) {
@@ -85,7 +85,7 @@ export class ItemUnitService {
       .build();
   }
 
-  async delete(request: GetItemUnitRequest): Promise<any> {
+  async delete(request: DetailRequest): Promise<any> {
     const itemUnit = await this.itemUnitRepository.findOne(request.id);
 
     if (!itemUnit) {

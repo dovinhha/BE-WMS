@@ -10,9 +10,9 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { DetailRequest } from '@utils/detail.request';
 import { ListItemTypeQuery } from './dto/query/list-item-type.query';
 import { CreateItemTypeRequest } from './dto/request/create-item-type.request';
-import { GetItemTypeRequest } from './dto/request/get-item-type.request';
 import { UpdateItemTypeRequest } from './dto/request/update-item-type.request';
 import { ItemTypeService } from './item-type.service';
 
@@ -32,7 +32,7 @@ export class ItemTypeController {
   }
 
   @Get(':id')
-  detail(@Param() request: GetItemTypeRequest) {
+  detail(@Param() request: DetailRequest) {
     return this.itemTypeService.detail(request);
   }
 
@@ -40,14 +40,14 @@ export class ItemTypeController {
   @Put(':id')
   update(
     @Body() request: UpdateItemTypeRequest,
-    @Param() param: GetItemTypeRequest,
+    @Param() param: DetailRequest,
   ) {
     return this.itemTypeService.update({ ...request, ...param });
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  delete(@Param() request: GetItemTypeRequest) {
+  delete(@Param() request: DetailRequest) {
     return this.itemTypeService.delete(request);
   }
 }

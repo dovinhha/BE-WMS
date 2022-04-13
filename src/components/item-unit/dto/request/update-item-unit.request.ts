@@ -8,11 +8,6 @@ import {
 } from 'class-validator';
 
 export class UpdateItemUnitRequest {
-  @IsNumber()
-  @Transform((value) => Number(value.value))
-  @IsNotEmpty()
-  id: number;
-
   @MinLength(1)
   @IsString()
   @IsNotEmpty()
