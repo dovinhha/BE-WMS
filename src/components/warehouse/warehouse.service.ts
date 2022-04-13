@@ -1,36 +1,72 @@
 import { ResponseCodeEnum } from '@enums/response-code.enum';
 import { ResponseMessageEnum } from '@enums/response-message.enum';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { ItemUnitRepository } from '@repositories/item-unit.repository';
+import { WarehouseStockRepository } from '@repositories/warehouse-stock.repository';
+import { WarehouseRepository } from '@repositories/warehouse.repository';
 import { DetailRequest } from '@utils/detail.request';
 import { PagingResponse } from '@utils/paging.response';
 import { ResponseBuilder } from '@utils/response-builder';
 import { plainToClass } from 'class-transformer';
+import { Connection } from 'typeorm';
+import { ListWarehouseQuery } from './dto/query/list-warehouse.query';
 import { CreateWarehouseRequest } from './dto/request/create-warehouse.request';
+import { ListWarehoseResponse } from './dto/response/list-warehouse.response';
 @Injectable()
 export class WarehouseService {
   constructor(
-    @InjectRepository(ItemUnitRepository)
-    private readonly itemUnitRepository: ItemUnitRepository,
+    @InjectRepository(WarehouseRepository)
+    private readonly warehouseRepository: WarehouseRepository,
+
+    @InjectRepository(WarehouseStockRepository)
+    private readonly warehouseStockRepository: WarehouseStockRepository,
+
+    @InjectConnection()
+    private readonly connection: Connection,
   ) {}
 
   async create(request: CreateWarehouseRequest): Promise<any> {
-    const itemUnitByCode = await this.itemUnitRepository.findOne({
+    const warehouseByCode = await this.warehouseRepository.findOne({
       code: request.code,
     });
 
-    if (itemUnitByCode) {
+    if (warehouseByCode) {
       return new ResponseBuilder()
         .withCode(ResponseCodeEnum.BAD_REQUEST)
         .withMessage(ResponseMessageEnum.CODE_INVALID)
         .build();
     }
 
-    const itemUnitEntity = this.itemUnitRepository.createEntity(request);
-    const itemUnit = await this.itemUnitRepository.save(itemUnitEntity);
+    const queryRunner = this.connection.createQueryRunner();
 
-    return new ResponseBuilder(itemUnit)
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const warehouseEntity = this.warehouseRepository.createEntity(request);
+      const warehouse = await queryRunner.manager.save(warehouseEntity);
+      const warehouseStockEntities = request.items.map((item) =>
+        this.warehouseStockRepository.createEntity(
+          item.itemId,
+          warehouse.id,
+          item.quantity,
+        ),
+      );
+
+      await queryRunner.manager.save(warehouseStockEntities);
+
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      return new ResponseBuilder()
+        .withCode(ResponseCodeEnum.BAD_REQUEST)
+        .withMessage(err?.message)
+        .build();
+    } finally {
+      await queryRunner.release();
+    }
+
+    return new ResponseBuilder()
       .withCode(ResponseCodeEnum.SUCCESS)
       .withMessage(ResponseMessageEnum.SUCCESS)
       .build();
@@ -88,45 +124,45 @@ export class WarehouseService {
   //     .build();
   // }
 
-  // async delete(request: DetailRequest): Promise<any> {
-  //   const itemUnit = await this.itemUnitRepository.findOne({
-  //     id: request.id,
-  //     deletedAt: null,
-  //   });
+  async delete(request: DetailRequest): Promise<any> {
+    const warehouse = await this.warehouseRepository.findOne({
+      id: request.id,
+      deletedAt: null,
+    });
 
-  //   if (!itemUnit) {
-  //     return new ResponseBuilder()
-  //       .withCode(ResponseCodeEnum.NOT_FOUND)
-  //       .withMessage(ResponseMessageEnum.NOT_FOUND)
-  //       .build();
-  //   }
+    if (!warehouse) {
+      return new ResponseBuilder()
+        .withCode(ResponseCodeEnum.NOT_FOUND)
+        .withMessage(ResponseMessageEnum.NOT_FOUND)
+        .build();
+    }
 
-  //   itemUnit.deletedAt = new Date();
+    warehouse.deletedAt = new Date();
 
-  //   await this.itemUnitRepository.save(itemUnit);
+    await this.warehouseRepository.save(warehouse);
 
-  //   return new ResponseBuilder()
-  //     .withCode(ResponseCodeEnum.SUCCESS)
-  //     .withMessage(ResponseMessageEnum.SUCCESS)
-  //     .build();
-  // }
+    return new ResponseBuilder()
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage(ResponseMessageEnum.SUCCESS)
+      .build();
+  }
 
-  // async list(request: ListItemUnitQuery): Promise<any> {
-  //   const [itemUnits, count] = await this.itemUnitRepository.list(request);
+  async list(request: ListWarehouseQuery): Promise<any> {
+    const [itemUnits, count] = await this.warehouseRepository.list(request);
 
-  //   const itemUnitReturn = plainToClass(GetItemUnitResponse, itemUnits, {
-  //     excludeExtraneousValues: true,
-  //   });
+    const itemUnitReturn = plainToClass(ListWarehoseResponse, itemUnits, {
+      excludeExtraneousValues: true,
+    });
 
-  //   return new ResponseBuilder<PagingResponse>({
-  //     items: itemUnitReturn,
-  //     meta: {
-  //       total: count,
-  //       page: request.page,
-  //     },
-  //   })
-  //     .withCode(ResponseCodeEnum.SUCCESS)
-  //     .withMessage(ResponseMessageEnum.SUCCESS)
-  //     .build();
-  // }
+    return new ResponseBuilder<PagingResponse>({
+      items: itemUnitReturn,
+      meta: {
+        total: count,
+        page: request.page,
+      },
+    })
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage(ResponseMessageEnum.SUCCESS)
+      .build();
+  }
 }

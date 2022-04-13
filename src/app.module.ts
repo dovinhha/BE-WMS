@@ -6,6 +6,7 @@ import { AuthModule } from '@components/auth/auth.module';
 import { ItemUnitModule } from '@components/item-unit/item-unit.module';
 import { ItemTypeModule } from '@components/item-type/item-type.module';
 import { ItemModule } from '@components/item/item.module';
+import { WarehouseModule } from '@components/warehouse/warehouse.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ItemModule } from '@components/item/item.module';
     ItemUnitModule,
     ItemTypeModule,
     ItemModule,
+    WarehouseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

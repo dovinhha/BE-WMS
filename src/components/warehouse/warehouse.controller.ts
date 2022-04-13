@@ -1,5 +1,16 @@
 import { JwtAuthGuard } from '@components/auth/guards/jwt-auth.guard';
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import { DetailRequest } from '@utils/detail.request';
+import { ListWarehouseQuery } from './dto/query/list-warehouse.query';
 import { CreateWarehouseRequest } from './dto/request/create-warehouse.request';
 import { WarehouseService } from './warehouse.service';
 
@@ -13,10 +24,10 @@ export class WarehouseController {
     return this.warehouseService.create(request);
   }
 
-  // @Get()
-  // list(@Query() request: ListItemUnitQuery) {
-  //   return this.itemUnitService.list(request);
-  // }
+  @Get()
+  list(@Query() request: ListWarehouseQuery) {
+    return this.warehouseService.list(request);
+  }
 
   // @Get(':id')
   // detail(@Param() request: DetailRequest) {
@@ -32,9 +43,9 @@ export class WarehouseController {
   //   return this.itemUnitService.update({ ...request, ...param });
   // }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Delete(':id')
-  // delete(@Param() request: DetailRequest) {
-  //   return this.itemUnitService.delete(request);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  delete(@Param() request: DetailRequest) {
+    return this.warehouseService.delete(request);
+  }
 }
