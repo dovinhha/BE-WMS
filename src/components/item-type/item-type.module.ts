@@ -7,6 +7,6 @@ import { ItemTypeService } from './item-type.service';
 @Module({
   imports: [TypeOrmModule.forFeature([ItemTypeRepository])],
   controllers: [ItemTypeController],
-  providers: [ItemTypeService],
+  providers: [ItemTypeService, ItemTypeRepository],
 })
 export class ItemTypeModule {}
