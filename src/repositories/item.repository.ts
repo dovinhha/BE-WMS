@@ -27,31 +27,19 @@ export class ItemRepository extends Repository<ItemEntity> {
         'i.price AS price',
         'i.created_at AS "createdAt"',
         'i.updated_at AS "updatedAt"',
-        `JSON_AGG(JSON_BUILD_OBJECT(
-        'id', qb1.id, 'code', qb1.code, 'name', qb1.name
-      )) AS "itemUnit"`,
-        `JSON_AGG(JSON_BUILD_OBJECT(
-        'id', qb2.id, 'code', qb2.code, 'name', qb2.name
-      )) AS "itemType"`,
+        `JSON_BUILD_OBJECT(
+        'id', iu.id, 'code', iu.code, 'name', iu.name
+        ) AS "itemUnit"`,
+        `JSON_BUILD_OBJECT(
+        'id', it.id, 'code', it.code, 'name', it.name
+        ) AS "itemType"`,
       ])
-      .innerJoin(
-        (qb) =>
-          qb
-            .select(['iu.id AS id', 'iu.name AS name', 'iu.code AS code'])
-            .from(ItemUnitEntity, 'iu'),
-        'qb1',
-        'qb1.id = i.item_unit_id',
-      )
-      .innerJoin(
-        (qb) =>
-          qb
-            .select(['it.id AS id', 'it.name AS name', 'it.code AS code'])
-            .from(ItemTypeEntity, 'it'),
-        'qb2',
-        'qb2.id = i.item_type_id',
-      )
+      .innerJoin(ItemUnitEntity, 'iu', 'iu.id = i.item_unit_id')
+      .innerJoin(ItemTypeEntity, 'it', 'it.id = i.item_type_id')
       .where('i.deleted_at IS NULL')
-      .groupBy('i.id');
+      .groupBy('i.id')
+      .addGroupBy('iu.id')
+      .addGroupBy('it.id');
     const data = await query
       .offset(request.skip)
       .limit(request.take)
@@ -70,30 +58,17 @@ export class ItemRepository extends Repository<ItemEntity> {
         'i.price AS price',
         'i.created_at AS "createdAt"',
         'i.updated_at AS "updatedAt"',
-        `JSON_AGG(JSON_BUILD_OBJECT(
-        'id', qb1.id, 'code', qb1.code, 'name', qb1.name
-      )) AS "itemUnit"`,
-        `JSON_AGG(JSON_BUILD_OBJECT(
-        'id', qb2.id, 'code', qb2.code, 'name', qb2.name
-      )) AS "itemType"`,
+        `JSON_BUILD_OBJECT(
+          'id', iu.id, 'code', iu.code, 'name', iu.name
+          ) AS "itemUnit"`,
+        `JSON_BUILD_OBJECT(
+          'id', it.id, 'code', it.code, 'name', it.name
+          ) AS "itemType"`,
       ])
-      .innerJoin(
-        (qb) =>
-          qb
-            .select(['iu.id AS id', 'iu.name AS name', 'iu.code AS code'])
-            .from(ItemUnitEntity, 'iu'),
-        'qb1',
-        'qb1.id = i.item_unit_id',
-      )
-      .innerJoin(
-        (qb) =>
-          qb
-            .select(['it.id AS id', 'it.name AS name', 'it.code AS code'])
-            .from(ItemTypeEntity, 'it'),
-        'qb2',
-        'qb2.id = i.item_type_id',
-      )
-      .where('i.id = :id', { id })
+      .innerJoin(ItemUnitEntity, 'iu', 'iu.id = i.item_unit_id')
+      .innerJoin(ItemTypeEntity, 'it', 'it.id = i.item_type_id')
+      .where('i.deleted_at IS NULL')
+      .andWhere('i.id = :id', { id })
       .andWhere('i.deleted_at IS NULL')
       .getRawOne();
   }
