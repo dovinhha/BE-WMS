@@ -6,12 +6,11 @@ export class WarehouseStockRepository extends Repository<WarehouseStockEntity> {
   public createEntity(
     itemId: number,
     warehouseId: number,
-    quantity: number,
   ): WarehouseStockEntity {
     const entity = new WarehouseStockEntity();
     entity.itemId = itemId;
     entity.warehouseId = warehouseId;
-    entity.quantity = quantity;
+    entity.quantity = 0;
     return entity;
   }
 }

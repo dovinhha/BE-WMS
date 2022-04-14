@@ -14,11 +14,7 @@ class WarehouseItem {
   itemId: number;
 }
 
-export class CreateWarehouseRequest {
-  @IsString()
-  @IsNotEmpty()
-  code: string;
-
+export class UpdateWarehouseRequest {
   @IsString()
   @IsNotEmpty()
   name: string;

@@ -12,6 +12,8 @@ import { plainToClass } from 'class-transformer';
 import { Connection } from 'typeorm';
 import { ListWarehouseQuery } from './dto/query/list-warehouse.query';
 import { CreateWarehouseRequest } from './dto/request/create-warehouse.request';
+import { UpdateWarehouseRequest } from './dto/request/update-warehouse.request';
+import { DetailWarehouseResponse } from './dto/response/detail-warehouse.response';
 import { ListWarehoseResponse } from './dto/response/list-warehouse.response';
 @Injectable()
 export class WarehouseService {
@@ -46,11 +48,7 @@ export class WarehouseService {
       const warehouseEntity = this.warehouseRepository.createEntity(request);
       const warehouse = await queryRunner.manager.save(warehouseEntity);
       const warehouseStockEntities = request.items.map((item) =>
-        this.warehouseStockRepository.createEntity(
-          item.itemId,
-          warehouse.id,
-          item.quantity,
-        ),
+        this.warehouseStockRepository.createEntity(item.itemId, warehouse.id),
       );
 
       await queryRunner.manager.save(warehouseStockEntities);
@@ -72,57 +70,76 @@ export class WarehouseService {
       .build();
   }
 
-  // async update(request: UpdateItemUnitRequest & DetailRequest): Promise<any> {
-  //   const itemUnit = await this.itemUnitRepository.findOne({
-  //     id: request.id,
-  //     deletedAt: null,
-  //   });
+  async update(request: UpdateWarehouseRequest & DetailRequest): Promise<any> {
+    const warehouse = await this.warehouseRepository.findOne({
+      id: request.id,
+      deletedAt: null,
+    });
 
-  //   if (!itemUnit) {
-  //     return new ResponseBuilder()
-  //       .withCode(ResponseCodeEnum.NOT_FOUND)
-  //       .withMessage(ResponseMessageEnum.NOT_FOUND)
-  //       .build();
-  //   }
+    if (!warehouse) {
+      return new ResponseBuilder()
+        .withCode(ResponseCodeEnum.NOT_FOUND)
+        .withMessage(ResponseMessageEnum.NOT_FOUND)
+        .build();
+    }
 
-  //   for (let key in request) {
-  //     itemUnit[key] = request[key];
-  //   }
+    for (let key in request) {
+      warehouse[key] = request[key];
+    }
 
-  //   await this.itemUnitRepository.save(itemUnit);
+    const warehouseStocks = await this.warehouseStockRepository.find({
+      warehouseId: warehouse.id,
+    });
 
-  //   const dataReturn = plainToClass(GetItemUnitResponse, itemUnit, {
-  //     excludeExtraneousValues: true,
-  //   });
+    const queryRunner = this.connection.createQueryRunner();
 
-  //   return new ResponseBuilder(dataReturn)
-  //     .withCode(ResponseCodeEnum.SUCCESS)
-  //     .withMessage(ResponseMessageEnum.SUCCESS)
-  //     .build();
-  // }
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.manager.save(warehouse);
+      await queryRunner.manager.remove(warehouseStocks);
+      const warehouseStockEntities = request.items.map((item) =>
+        this.warehouseStockRepository.createEntity(item.itemId, warehouse.id),
+      );
 
-  // async detail(request: DetailRequest): Promise<any> {
-  //   const itemUnit = await this.itemUnitRepository.findOne({
-  //     id: request.id,
-  //     deletedAt: null,
-  //   });
+      await queryRunner.manager.save(warehouseStockEntities);
 
-  //   if (!itemUnit) {
-  //     return new ResponseBuilder()
-  //       .withCode(ResponseCodeEnum.NOT_FOUND)
-  //       .withMessage(ResponseMessageEnum.NOT_FOUND)
-  //       .build();
-  //   }
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      return new ResponseBuilder()
+        .withCode(ResponseCodeEnum.BAD_REQUEST)
+        .withMessage(err?.message)
+        .build();
+    } finally {
+      await queryRunner.release();
+    }
 
-  //   const dataReturn = plainToClass(GetItemUnitResponse, itemUnit, {
-  //     excludeExtraneousValues: true,
-  //   });
+    return new ResponseBuilder()
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage(ResponseMessageEnum.SUCCESS)
+      .build();
+  }
 
-  //   return new ResponseBuilder(dataReturn)
-  //     .withCode(ResponseCodeEnum.SUCCESS)
-  //     .withMessage(ResponseMessageEnum.SUCCESS)
-  //     .build();
-  // }
+  async detail(request: DetailRequest): Promise<any> {
+    const warehouse = await this.warehouseRepository.detail(request);
+
+    if (!warehouse) {
+      return new ResponseBuilder()
+        .withCode(ResponseCodeEnum.NOT_FOUND)
+        .withMessage(ResponseMessageEnum.NOT_FOUND)
+        .build();
+    }
+
+    const dataReturn = plainToClass(DetailWarehouseResponse, warehouse, {
+      excludeExtraneousValues: true,
+    });
+
+    return new ResponseBuilder(dataReturn)
+      .withCode(ResponseCodeEnum.SUCCESS)
+      .withMessage(ResponseMessageEnum.SUCCESS)
+      .build();
+  }
 
   async delete(request: DetailRequest): Promise<any> {
     const warehouse = await this.warehouseRepository.findOne({
@@ -148,14 +165,14 @@ export class WarehouseService {
   }
 
   async list(request: ListWarehouseQuery): Promise<any> {
-    const [itemUnits, count] = await this.warehouseRepository.list(request);
+    const [warehouses, count] = await this.warehouseRepository.list(request);
 
-    const itemUnitReturn = plainToClass(ListWarehoseResponse, itemUnits, {
+    const warehouseReturn = plainToClass(ListWarehoseResponse, warehouses, {
       excludeExtraneousValues: true,
     });
 
     return new ResponseBuilder<PagingResponse>({
-      items: itemUnitReturn,
+      items: warehouseReturn,
       meta: {
         total: count,
         page: request.page,
