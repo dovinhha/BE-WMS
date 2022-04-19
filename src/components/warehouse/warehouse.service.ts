@@ -65,7 +65,7 @@ export class WarehouseService {
     }
 
     return new ResponseBuilder()
-      .withCode(ResponseCodeEnum.SUCCESS)
+      .withCode(ResponseCodeEnum.CREATED)
       .withMessage(ResponseMessageEnum.SUCCESS)
       .build();
   }

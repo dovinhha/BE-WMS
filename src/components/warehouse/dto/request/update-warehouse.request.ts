@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 
 class WarehouseItem {
@@ -27,8 +28,9 @@ export class UpdateWarehouseRequest {
   @IsOptional()
   description: string;
 
-  @Type(() => WarehouseItem)
   @ArrayUnique<WarehouseItem>((item) => item.itemId)
+  @ValidateNested({ each: true })
+  @Type(() => WarehouseItem)
   @ArrayNotEmpty()
   items: WarehouseItem[];
 }

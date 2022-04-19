@@ -9,32 +9,36 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-class WarehouseItem {
+class PurchaseOrderItem {
   @IsNumber()
   @IsNotEmpty()
   itemId: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  warehouseId: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  planQuantity: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  price: number;
 }
 
-export class CreateWarehouseRequest {
-  @IsString()
-  @IsNotEmpty()
-  code: string;
-
+export class UpdatePurchaseOrderRequest {
   @IsString()
   @IsNotEmpty()
   name: string;
 
   @IsString()
   @IsOptional()
-  address: string;
-
-  @IsString()
-  @IsOptional()
   description: string;
 
-  @ArrayUnique<WarehouseItem>((item) => item.itemId)
+  @ArrayUnique<PurchaseOrderItem>((item) => item.itemId)
   @ValidateNested({ each: true })
-  @Type(() => WarehouseItem)
+  @Type(() => PurchaseOrderItem)
   @ArrayNotEmpty()
-  items: WarehouseItem[];
+  items: PurchaseOrderItem[];
 }

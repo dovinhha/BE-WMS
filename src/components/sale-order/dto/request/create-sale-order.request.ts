@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   ArrayUnique,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -9,13 +10,21 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-class WarehouseItem {
+class SaleOrderItem {
   @IsNumber()
   @IsNotEmpty()
   itemId: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  warehouseId: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  planQuantity: number;
 }
 
-export class CreateWarehouseRequest {
+export class CreateSaleOrderRequest {
   @IsString()
   @IsNotEmpty()
   code: string;
@@ -24,17 +33,17 @@ export class CreateWarehouseRequest {
   @IsNotEmpty()
   name: string;
 
-  @IsString()
-  @IsOptional()
-  address: string;
+  @IsInt()
+  @IsNotEmpty()
+  customerId: number;
 
   @IsString()
   @IsOptional()
   description: string;
 
-  @ArrayUnique<WarehouseItem>((item) => item.itemId)
+  @ArrayUnique<SaleOrderItem>((item) => item.itemId)
   @ValidateNested({ each: true })
-  @Type(() => WarehouseItem)
+  @Type(() => SaleOrderItem)
   @ArrayNotEmpty()
-  items: WarehouseItem[];
+  items: SaleOrderItem[];
 }

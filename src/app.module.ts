@@ -7,6 +7,8 @@ import { ItemUnitModule } from '@components/item-unit/item-unit.module';
 import { ItemTypeModule } from '@components/item-type/item-type.module';
 import { ItemModule } from '@components/item/item.module';
 import { WarehouseModule } from '@components/warehouse/warehouse.module';
+import { PurchaseOrderModule } from '@components/purchase-order/purchase-order.module';
+import { CustomerModule } from '@components/customer/customer.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { WarehouseModule } from '@components/warehouse/warehouse.module';
     ItemTypeModule,
     ItemModule,
     WarehouseModule,
+    PurchaseOrderModule,
+    CustomerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

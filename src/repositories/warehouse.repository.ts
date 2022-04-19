@@ -69,6 +69,7 @@ export class WarehouseRepository extends Repository<WarehouseEntity> {
       )
       .where('w.id = :id', { id: request.id })
       .andWhere('w.deleted_at IS NULL')
+      .groupBy('w.id')
       .getRawOne();
   }
 }

@@ -3,7 +3,7 @@ import { ResponsePayload } from './response-payload';
 
 export class ResponseBuilder<T> {
   private payload: ResponsePayload<T> = {
-    code: ResponseCodeEnum.SUCCESS,
+    statusCode: ResponseCodeEnum.SUCCESS,
   };
 
   constructor(data?: T) {
@@ -11,7 +11,7 @@ export class ResponseBuilder<T> {
   }
 
   withCode(code: ResponseCodeEnum): ResponseBuilder<T> {
-    this.payload.code = code;
+    this.payload.statusCode = code;
     return this;
   }
 

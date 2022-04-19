@@ -16,10 +16,6 @@ export class createPurchaseOrderTable1649079616442
             generationStrategy: 'increment',
           },
           {
-            name: 'customer_id',
-            type: 'int',
-          },
-          {
             name: 'code',
             type: 'varchar',
             length: '45',
